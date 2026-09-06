@@ -1,15 +1,15 @@
 import type { PoolClient } from "pg";
 import { pool } from "./database.js";
 import { AuthRepository } from "../modules/auth/auth.repository.js";
-
+import { UnitOfWork } from "./unit_of_work.js";
 export async function runInTransaction<T>(
-  callback: (client: AuthRepository) => Promise<T>,
+  callback: (unitOfWork: UnitOfWork) => Promise<T>,
 ): Promise<T> {
   const client = await pool.connect();
-  const authRepository = new AuthRepository(client);
+  const unitOfWork = new UnitOfWork(client);
   try {
     await client.query(`BEGIN`);
-    const result = await callback(authRepository);
+    const result = await callback(unitOfWork);
     await client.query(`COMMIT`);
 
     return result;

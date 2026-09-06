@@ -51,6 +51,35 @@ async function initializeDatabase() {
     
     `);
 
+  await pool.query(`
+      CREATE TABLE IF NOT EXISTS ORGANIZATIONS(
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        name TEXT UNIQUE NOT NULL,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      
+      )
+    `);
+
+  await pool.query(`
+    
+    CREATE TABLE IF NOT EXISTS MEMBERSHIPS(
+      
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      user_id UUID NOT NULL REFERENCES users(id)
+      ON DELETE CASCADE,
+      organization_id UUID NOT NULL REFERENCES organizations(id)
+      ON DELETE CASCADE,
+      role TEXT NOT NULL CHECK (role IN ('owner', 'admin','member' ,'incident_commander')),
+      joined_at NOT NULL TIMESTAMPTZ DEFAULT NOW(),
+
+
+      CONSTRAINT unique_membership
+      UNIQUE(user_id,organization_id)
+
+    )
+    
+    `);
+
   console.log("database initialized");
 }
 async function startServer() {
