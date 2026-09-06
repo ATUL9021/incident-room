@@ -7,6 +7,8 @@
   "type": "module",
   "main": "./dist/app.js",
   "scripts": {
+    "dev": "tsx watch /src/app.ts",
+    "build": "tsc",
     "test": "echo \"Error: no tests specified\" && exit 1",
     "start": "node --watch ./dist/app.js"
   },
@@ -24,6 +26,7 @@
     "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
-    "@types/pg": "^8.23.1"
+    "@types/pg": "^8.23.1",
+    "tsx": "^4.23.13"
   }
 }

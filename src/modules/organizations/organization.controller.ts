@@ -18,6 +18,13 @@ export class OrganizationController {
     return res.status(201).send(organizationOutput);
   };
 
+  discover = async (req: Request, res: Response, next: NextFunction) => {
+    const organizationOutputs: OrganizationOutput[] =
+      await this.organizationService.discoverAllOrganizationsForJoiningAnUser();
+
+    return res.status(200).send(organizationOutputs);
+  };
+
   getById = async (req: Request, res: Response, next: NextFunction) => {
     const organizationId = req.params.organizationId as string;
 

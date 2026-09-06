@@ -79,4 +79,11 @@ export class OrganizationService {
 
     return organizationOutputs;
   }
+
+  async discoverAllOrganizationsForJoiningAnUser() {
+    const organizationOutputs: OrganizationOutput[] =
+      await this.organizationRepository.discoverAllOrganizationsAvailableForJoining();
+
+    return organizationOutputs;
+  }
 }

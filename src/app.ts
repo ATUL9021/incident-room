@@ -1,6 +1,8 @@
 import express from "express";
 import "dotenv/config";
 import authRouter from "./modules/auth/auth.routes.js";
+import organizationRouter from "./modules/organizations/organization.routes.js";
+import joinRequestRouter from "./modules/join-requests/join_requests.routes.js";
 import { errorHandler } from "./middleware/error_handler.middlwre.js";
 import { pool } from "./database/database.js";
 import { authenticate } from "./middleware/auth.middlware.js";
@@ -10,6 +12,8 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use("/auth", authRouter);
+app.use("/organizations", organizationRouter);
+app.use("/organizations", joinRequestRouter);
 app.use(errorHandler);
 
 async function initializeDatabase() {
@@ -79,6 +83,27 @@ async function initializeDatabase() {
     )
     
     `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS join_request(
+    id UUId NOT NULL DEFAULT gen_random_uuid(),
+    user_id NOT NULL UUID REFERENCES users(id)
+    ON DELETE CASCADE,
+    organization_id UUID NOT NULL REFERENCES organizations(id)
+    ON DELETE CASCADE,
+
+    status TEXT NOT NULL DEFAULT 'pending'
+    check (status IN ('pending', 'declined' , 'accepted')),
+
+    created_at NOT NULL TIMESTAMPTZ DEFAULT NOW(),
+
+    CONSTRAINT unique_userId_orgId
+    unique(user_id, organization_id);
+    
+    )    
+
+    
+  `);
 
   console.log("database initialized");
 }

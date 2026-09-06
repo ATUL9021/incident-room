@@ -70,6 +70,19 @@ export class OrganizationRepository {
     return result.rows;
   }
 
+  async discoverAllOrganizationsAvailableForJoining(): Promise<
+    OrganizationOutput[]
+  > {
+    const result = await this.db.query(
+      `
+    SELECT o.id,o.name,o.created_at AS "createdAt" FROM organizations o 
+    
+      `,
+    );
+
+    return result.rows;
+  }
+
   async createMemberShipInOrganization(
     organizationId: string,
     userId: string,
