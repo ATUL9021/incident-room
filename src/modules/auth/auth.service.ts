@@ -11,6 +11,7 @@ import {
 } from "../../utils/refresh_token.js";
 
 import type { PoolClient } from "pg";
+import type { UnitOfWork } from "../../database/unit_of_work.js";
 
 export class AuthService {
   constructor(private readonly authRepository: AuthRepository) {}
@@ -101,9 +102,11 @@ export class AuthService {
     }
 
     const { finalRefreshToken, userId } = await runInTransaction(
-      async (repoConection) => {
+      async (unitOfWork) => {
         let session: Session =
-          await repoConection.findSessionByIdWithForUpdate(sessionId);
+          await unitOfWork.authRepository.findSessionByIdWithForUpdate(
+            sessionId,
+          );
 
         if (!session) {
           throw new AppError(
@@ -127,13 +130,13 @@ export class AuthService {
 
         //revoke current session
 
-        await repoConection.revokeSession(session.id);
+        await unitOfWork.authRepository.revokeSession(session.id);
 
         //create new sesssion
 
         const refreshToken = generateRefreshToken();
         const refreshTokenHash = hashRefreshToken(refreshToken);
-        const result = await repoConection.createSession(
+        const result = await unitOfWork.authRepository.createSession(
           session.userId,
           refreshTokenHash,
           new Date(
@@ -143,7 +146,7 @@ export class AuthService {
 
         //update replaced by in old session.
 
-        await repoConection.replaceNewSessionInOldSession(
+        await unitOfWork.authRepository.replaceNewSessionInOldSession(
           session.id,
           result.sessionId,
         );
@@ -170,8 +173,9 @@ export class AuthService {
       );
     }
 
-    await runInTransaction(async (client) => {
-      const session = await client.findSessionByIdWithForUpdate(sessionId);
+    await runInTransaction(async (unitOfWork) => {
+      const session =
+        await unitOfWork.authRepository.findSessionByIdWithForUpdate(sessionId);
 
       if (!session) {
         throw new AppError(
@@ -199,7 +203,7 @@ export class AuthService {
           "Refresh token is invalid",
         );
       }
-      await client.revokeSession(sessionId);
+      await unitOfWork.authRepository.revokeSession(sessionId);
     });
   }
 }
