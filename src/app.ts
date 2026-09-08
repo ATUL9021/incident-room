@@ -1,8 +1,10 @@
 import express from "express";
 import "dotenv/config";
 import authRouter from "./modules/auth/auth.routes.js";
+import membershipRouter from "./modules/memberships/memberships.routes.js";
 import organizationRouter from "./modules/organizations/organization.routes.js";
 import joinRequestRouter from "./modules/join-requests/join_requests.routes.js";
+import UserRouter from "./modules/users/users.routes.js";
 import { errorHandler } from "./middleware/error_handler.middlwre.js";
 import { pool } from "./database/database.js";
 import { authenticate } from "./middleware/auth.middlware.js";
@@ -14,6 +16,8 @@ app.use(cookieParser());
 app.use("/auth", authRouter);
 app.use("/organizations", organizationRouter);
 app.use("/organizations", joinRequestRouter);
+app.use("/organizations", membershipRouter);
+app.use("/users", UserRouter);
 app.use(errorHandler);
 
 async function initializeDatabase() {

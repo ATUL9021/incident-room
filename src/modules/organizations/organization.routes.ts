@@ -16,7 +16,7 @@ router.get("/discover", authenticate, organizationController.discover);
 router.post(
   "/",
   authenticate,
-  validate(createOrganizationSchema),
+  validate({ body: createOrganizationSchema }),
   organizationController.create,
 );
 
