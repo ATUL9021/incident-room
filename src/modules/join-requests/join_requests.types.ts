@@ -3,5 +3,7 @@ export interface JoinRequestsOutput {
   createdAt: string;
   userId: string;
   organizationId: string;
-  status: "pending" | "accepted" | "declined";
+  status: JoinRequestStatus;
 }
+
+export type JoinRequestStatus = "pending" | "accepted" | "declined";

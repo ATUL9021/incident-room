@@ -14,13 +14,13 @@ const authController = new AuthController(
 
 router.post(
   "/register",
-  validate(registerSchema),
+  validate({ body: registerSchema }),
   authController.register.bind(authController),
 );
 
 router.post(
   "/login",
-  validate(loginSchema),
+  validate({ body: loginSchema }),
   authController.login.bind(authController),
 );
 

@@ -1,8 +1,7 @@
 import type { Pool, PoolClient } from "pg";
-import type {
-  MemberShipOutput,
-  OrganizationOutput,
-} from "./organization.types.js";
+import type { OrganizationOutput } from "./organization.types.js";
+
+import type { MemberShipOutput } from "../memberships/memberships.types.js";
 export class OrganizationRepository {
   constructor(private readonly db: Pool | PoolClient) {}
 
@@ -81,31 +80,5 @@ export class OrganizationRepository {
     );
 
     return result.rows;
-  }
-
-  async createMemberShipInOrganization(
-    organizationId: string,
-    userId: string,
-    role: string,
-  ): Promise<MemberShipOutput> {
-    const result = await this.db.query(
-      `
-      
-      
-      INSERT INTO MEMBERSHIPS (
-
-        organization_id,
-        user_id,
-        role
-        
-      ) 
-      VALUES($1,$2,$3)
-      RETURNING id,organization_id AS "organizationId" , user_id AS "userId",role,joined_at AS "joinedAt";
-      
-    `,
-      [organizationId, userId, role],
-    );
-
-    return result.rows[0];
   }
 }

@@ -32,6 +32,18 @@ export class JoinRequestsController {
     res.status(200).send(joinRequestOuptut);
   };
 
+  update = async (req: Request, res: Response, next: NextFunction) => {
+    // requestId, userId, status
+    const userId = req.userId!;
+    const status = req.body.status;
+    const requestId = req.params.requestId as string;
+    const result = this.joinRequestsService.updateJoiningRequest(
+      userId,
+      requestId,
+      status,
+    );
+  };
+
   delete = async (req: Request, res: Response, next: NextFunction) => {
     const requestId = req.params.requestId as string;
     const userId = req.userId!;

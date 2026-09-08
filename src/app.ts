@@ -73,7 +73,7 @@ async function initializeDatabase() {
       ON DELETE CASCADE,
       organization_id UUID NOT NULL REFERENCES organizations(id)
       ON DELETE CASCADE,
-      role TEXT NOT NULL CHECK (role IN ('owner', 'admin','member' ,'incident_commander')),
+      role TEXT NOT NULL CHECK (role IN ('owner', 'admin','member')),
       joined_at NOT NULL TIMESTAMPTZ DEFAULT NOW(),
 
 

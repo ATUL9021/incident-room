@@ -1,9 +1,8 @@
 import type { OrganizationRepository } from "./organization.repository.js";
 import { runInTransaction } from "../../database/transaction.js";
-import type {
-  OrganizationOutput,
-  MemberShipRole,
-} from "./organization.types.js";
+import type { OrganizationOutput } from "./organization.types.js";
+
+import type { MemberShipRole } from "../memberships/memberships.types.js";
 import { AppError } from "../../errors/AppError.js";
 import { ERROR_CODES } from "../../errors/errorCodes.js";
 
@@ -28,7 +27,7 @@ export class OrganizationService {
       const role: MemberShipRole = "owner";
 
       const memberShipOutput =
-        await unitOfWork.organizationRepository.createMemberShipInOrganization(
+        await unitOfWork.membershipRepository.createMembership(
           organizationOutput.id,
           userId,
           role,

@@ -1,7 +1,12 @@
 import { AppError } from "../../errors/AppError.js";
 import { ERROR_CODES } from "../../errors/errorCodes.js";
 import type { JoinRequestsRepository } from "./join_requests.repository.js";
-import type { JoinRequestsOutput } from "./join_requests.types.js";
+import type {
+  JoinRequestsOutput,
+  JoinRequestStatus,
+} from "./join_requests.types.js";
+
+import { runInTransaction } from "../../database/transaction.js";
 export class JoinRequestsService {
   constructor(
     private readonly joinRequestsRepository: JoinRequestsRepository,
@@ -64,5 +69,48 @@ export class JoinRequestsService {
     }
 
     return joinRequestOutput;
+  }
+
+  async updateJoiningRequest(
+    userId: string,
+    requestId: string,
+    status: JoinRequestStatus,
+  ) {
+    return await runInTransaction(async (unitOfWork) => {
+      const joinRequestOutput =
+        await unitOfWork.joinRequestsRepository.updateJoiningRequest(
+          userId,
+          requestId,
+          status,
+        );
+
+      if (!joinRequestOutput) {
+        throw new AppError(
+          403,
+          ERROR_CODES.UNABLE_TO_UPDATE_JOIN_REQUEST,
+          "cannot create joining request",
+        );
+      }
+
+      if (status === "accepted") {
+        const result = await unitOfWork.membershipRepository.createMembership(
+          joinRequestOutput.organizationId,
+          joinRequestOutput.userId,
+          "member",
+        );
+
+        if (!result) {
+          throw new AppError(
+            403,
+            ERROR_CODES.UNABLE_TO_SET_MEMEBERSHIP,
+            "cannot set membership",
+          );
+        }
+      }
+
+      return {
+        status: status,
+      };
+    });
   }
 }
